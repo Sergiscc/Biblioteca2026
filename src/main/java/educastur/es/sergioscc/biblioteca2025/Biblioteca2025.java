@@ -5,7 +5,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Scanner;
      
-
+/**
+ * Biblioteca2025
+ *
+ * @author 1dawd09
+ * @version 1.2
+ */
 public class Biblioteca2025 {
 
     private static Scanner sc = new Scanner(System.in);
