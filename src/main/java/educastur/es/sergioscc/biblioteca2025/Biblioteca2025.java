@@ -2,8 +2,9 @@ package educastur.es.sergioscc.biblioteca2025;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
-
+     
 /**
  * Biblioteca2025
  *
@@ -21,9 +22,10 @@ public class Biblioteca2025 {
 
     public static void main(String[] args) {
         cargaDatos();
-        menuPrincipal();
+        //listadosConStreams();
+        ordenarConStreams();
     }
-
+    
     //#region CARGAR DATOS
     public static void cargaDatos() {
         cargaLibros();
@@ -32,6 +34,72 @@ public class Biblioteca2025 {
         cargarPrestamosHist();
     }
 
+    public static void listadosConStreams(){
+        //Listados generales de libros y usuarios con STREAMS
+        System.out.println("Libros listados desde un STREAM:");
+        libros.stream().forEach(l->System.out.println(l));
+        System.out.println("\nUsuarios listados desde un STREAM:");
+        usuarios.stream().forEach(u->System.out.println(u));
+        
+        //Listados selectivos (filter) con STREAMS
+        System.out.println("\nLibros de la seccion aventuras:");
+        libros.stream().filter(l-> l.getGenero().equalsIgnoreCase("aventuras"))
+                       .forEach(l->System.out.println(l));
+        
+        System.out.println("\nLibros de la seccion novela negra o del autor JRR tolkien:");
+        libros.stream().filter(l-> l.getGenero().equalsIgnoreCase("novela negra")
+                       || l.getAutor().equalsIgnoreCase("jrr tolkien"))
+                       .forEach(l->System.out.println(l));
+        
+        System.out.println("\nPrestamos fuera de plazo:");
+        prestamos.stream().filter(p-> p.getFechaDev().isBefore(LocalDate.now()))
+                       .forEach(p->System.out.println(p));
+        
+        System.out.println("\nPrestamos activos y no activos del usuario(teclear NOMBRE):");
+        String nombre=sc.next();
+        prestamos.stream().filter(p->p.getUsuarioPrest().getNombre().equalsIgnoreCase(nombre))
+                .forEach(p->System.out.println(p));
+        prestamosHist.stream().filter(p->p.getUsuarioPrest().getNombre().equalsIgnoreCase(nombre))
+                .forEach(p->System.out.println(p));
+        
+        System.out.println("\nPrestamos Fuera de plazo de un usuario(teclear NOMBRE):");
+        String nombre2=sc.next();
+        prestamos.stream().filter(p->p.getUsuarioPrest().getNombre().equalsIgnoreCase(nombre2)
+                        && p.getFechaDev().isBefore(LocalDate.now()))
+                        .forEach(p->System.out.println(p));
+        
+        System.out.println("\nPrestamos activos de libros del genero aventuras:");
+        prestamos.stream().filter(p->p.getLibroPrest().getGenero().equalsIgnoreCase("aventuras"))
+                .forEach(p->System.out.println(p)); 
+    }
+    
+    public static void ordenarConStreams(){
+        System.out.println("\nListado de Libros ordenados alfabeticamente por titulo:");
+        libros.stream().sorted(Comparator.comparing(Libro::getTitulo)).forEach(l->System.out.println(l));       
+    
+    
+        System.out.println("\nListado de Prestamos ordenados por fecha de prestamo:");
+        prestamos.stream().sorted(Comparator.comparing(Prestamo::getFechaPrest)).forEach(p->System.out.println(p));
+        
+        System.out.println("\nListado de Libros ordenados por numeros de prestamo:");
+        libros.stream().sorted(Comparator.comparing(l->numPrestamosLibro(l.getIsbn()))).forEach(l->System.out.println(l)); 
+    }
+    
+    public static int numPrestamosLibro(String isbn) {
+        int cont=0;
+        for (Prestamo p : prestamos) {
+           if (p.getLibroPrest().getIsbn().equalsIgnoreCase(isbn)){
+                cont++;
+            } 
+        }  
+        for (Prestamo p : prestamosHist) {
+           if (p.getLibroPrest().getIsbn().equalsIgnoreCase(isbn)){
+                cont++;
+            } 
+        }
+        return cont;    
+    }
+    
     public static void cargaLibros() {
         libros.add(new Libro("1-11", "El Hobbit", "JRR Tolkien", "Aventuras", 3));
         libros.add(new Libro("1-22", "El Silmarillon", "JRR Tolkien", "Aventuras", 3));
